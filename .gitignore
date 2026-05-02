@@ -1,9 +1,5 @@
 ﻿.venv/
 venv/
-chroma_db/
-data/raw/
-data/cleaned/
-data/chunks/
 __pycache__/
 *.pyc
 debug_*.png

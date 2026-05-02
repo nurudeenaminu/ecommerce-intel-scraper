@@ -307,7 +307,7 @@ response = anthropic_client.messages.create(model="claude-opus-4-5", messages=me
 ## 👤 Author
 
 **Nurudeen Aminu**
-[GitHub](https://github.com/nurudeenaminu) · [Upwork](https://upwork.com)
+[GitHub](https://github.com/nurudeenaminu) · [Upwork](https://upwork.com) · [Linkedin](linkedin.com/in/amnurudeen)
 
 > Built to demonstrate the complete data value chain:
 > **collection → cleaning → enrichment → AI-ready structuring → semantic retrieval → deployed product**
