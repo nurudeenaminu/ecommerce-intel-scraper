@@ -1,9 +1,10 @@
 streamlit
 pandas
-chromadb==0.4.24
+chromadb==0.5.23
 sentence-transformers
 tiktoken
 textblob
 rank-bm25
 google-genai
 nltk
+numpy<2.0.0
