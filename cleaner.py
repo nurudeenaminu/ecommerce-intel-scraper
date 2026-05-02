@@ -20,13 +20,16 @@ def clean_text(text):
 def clean_price(price):
     if not price or not isinstance(price, str):
         return None
-    digits = re.sub(r'[^\d.]', '', price)
+    # Remove ALL currency symbols and text (GHS, USD, $, £, etc.)
+    digits = re.sub(r'[^\d.,]', '', price)
+    # Handle comma-formatted numbers like 3,080.00
+    digits = digits.replace(',', '')
     try:
         val = float(digits)
-        return val if val > 0 else None
+        return round(val, 2) if val > 0 else None
     except ValueError:
         return None
-
+    
 def clean_rating(rating):
     if not rating:
         return None

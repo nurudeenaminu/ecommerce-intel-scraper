@@ -5,6 +5,7 @@ from google.genai import types
 from sentence_transformers import SentenceTransformer
 from rank_bm25 import BM25Okapi
 import chromadb
+import time
 
 # ─── CONFIG ───────────────────────────────────────────────
 CHROMA_PATH     = "./chroma_db"
@@ -186,6 +187,13 @@ def main():
 
     for item in EVAL_SET:
         print(f"  [{item['id']:02d}] {item['question'][:55]}...")
+        
+        # Wait between calls to respect free tier limits
+        # Free tier: 5 req/min, 20 req/day
+        # We wait 65 seconds between each to stay safe
+        if item["id"] > 1:
+            print(f"        Waiting 65s for rate limit...")
+            time.sleep(65)
 
         search_results = hybrid_search(
             item["question"], collection, embedder, bm25, all_chunks
