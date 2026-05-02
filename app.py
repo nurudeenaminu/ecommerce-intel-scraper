@@ -20,25 +20,165 @@ SYSTEM_PROMPT = """You are a knowledgeable e-commerce product assistant.
 You help users find the right products based on their needs, budget, and preferences.
 You have access to real Amazon product data including descriptions, customer reviews,
 prices, ratings, and sentiment analysis scores.
-
 Guidelines:
-- Answer based ONLY on the product data provided in the context
-- If the context does not contain enough information, say so clearly and honestly
-- Never invent product names, prices, or features not present in the context
-- When recommending products, mention the price, rating, and why it fits the user's need
-- Keep answers conversational, warm, and concise
-- If asked something outside your dataset say: "I don't have reliable data on that in my current dataset" """
+- Answer based ONLY on the product data provided
+- If context lacks info, say so clearly
+- Never invent product names, prices, or features
+- Mention price, rating, and fit when recommending
+- Be conversational, warm, and concise
+- Outside dataset: say you don't have reliable data on that"""
 
-# ─── PAGE CONFIG ──────────────────────────────────────────
-def load_css():
-    css_path = os.path.join(os.path.dirname(__file__), "style.css")
-    if os.path.exists(css_path):
-        with open(css_path, encoding="utf-8") as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+st.set_page_config(
+    page_title="ShopMind AI",
+    page_icon="🛍️",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
-load_css()
+# ─── CSS ──────────────────────────────────────────────────
+st.markdown("""<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap');
 
-# ─── CACHED RESOURCES ─────────────────────────────────────
+body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+    background-color: #0f0f13 !important;
+    font-family: 'DM Sans', sans-serif;
+    color: #e8e8f0;
+}
+[data-testid="block-container"] {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1rem !important;
+    max-width: 860px !important;
+    margin: 0 auto !important;
+}
+[data-testid="stSidebar"] {
+    background: #16161e !important;
+    border-right: 1px solid #2a2a35 !important;
+}
+[data-testid="stSidebar"] section { padding: 1.5rem 1rem !important; }
+
+#MainMenu, footer, [data-testid="stToolbar"],
+[data-testid="stDecoration"] { display: none !important; }
+
+/* User bubble — right aligned purple */
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+    flex-direction: row-reverse !important;
+    background: transparent !important;
+}
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) .stMarkdown {
+    background: linear-gradient(135deg, #6c63ff, #7c3aed) !important;
+    color: #fff !important;
+    border-radius: 18px 18px 4px 18px !important;
+    padding: 10px 15px !important;
+    max-width: 72% !important;
+    margin-left: auto !important;
+}
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="chatAvatarIcon-user"] {
+    background: linear-gradient(135deg, #6c63ff, #a855f7) !important;
+    border-radius: 50% !important;
+}
+
+/* Assistant bubble — left dark card */
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+    background: transparent !important;
+}
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) .stMarkdown {
+    background: #1c1c27 !important;
+    border: 1px solid #2a2a35 !important;
+    color: #d8d8e8 !important;
+    border-radius: 18px 18px 18px 4px !important;
+    padding: 10px 15px !important;
+    max-width: 72% !important;
+}
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="chatAvatarIcon-assistant"] {
+    background: #1e1e2a !important;
+    border: 1px solid #2a2a35 !important;
+    border-radius: 50% !important;
+}
+
+/* Input box */
+[data-testid="stChatInput"] textarea {
+    background: #1c1c27 !important;
+    border: 1px solid #2a2a35 !important;
+    border-radius: 14px !important;
+    color: #e8e8f0 !important;
+    font-family: 'DM Sans', sans-serif !important;
+}
+[data-testid="stChatInput"] textarea:focus {
+    border-color: #6c63ff !important;
+    box-shadow: 0 0 0 3px rgba(108,99,255,0.15) !important;
+}
+[data-testid="stChatInput"] textarea::placeholder { color: #44445a !important; }
+
+/* Buttons */
+.stButton button {
+    background: #1c1c27 !important;
+    border: 1px solid #2a2a35 !important;
+    color: #9090a8 !important;
+    border-radius: 10px !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 13px !important;
+    transition: all 0.15s !important;
+    text-align: left !important;
+}
+.stButton button:hover {
+    border-color: #6c63ff !important;
+    color: #c4b5fd !important;
+    background: #1a1a2e !important;
+}
+
+/* Filter badge */
+.fbadge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #1a2535; border: 1px solid #2a4060;
+    border-radius: 20px; padding: 3px 10px;
+    font-size: 11px; color: #60a5fa; margin-bottom: 6px;
+}
+
+/* Thinking dots */
+.tdots { display: flex; align-items: center; gap: 5px; padding: 4px 0; }
+.tdot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #6c63ff;
+    animation: tb 1.3s infinite ease-in-out;
+    display: inline-block;
+}
+.tdot:nth-child(2) { animation-delay: 0.16s; }
+.tdot:nth-child(3) { animation-delay: 0.32s; }
+@keyframes tb {
+    0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+    30%          { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Stat cards */
+.scard {
+    background: #1c1c27; border: 1px solid #2a2a35;
+    border-radius: 10px; padding: 10px; text-align: center;
+    margin-bottom: 6px;
+}
+.snum { font-size: 22px; font-weight: 600; color: #a78bfa; }
+.slbl { font-size: 10px; color: #44445a; text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* Section labels */
+.slabel {
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: #44445a; margin: 1.2rem 0 0.5rem;
+}
+
+/* Welcome */
+.welcome {
+    text-align: center; padding: 3rem 1rem;
+    color: #6b6b80; font-size: 14px; line-height: 1.7;
+}
+.welcome h2 { color: #f0f0f8; font-size: 22px; margin-bottom: 0.5rem; }
+
+/* Mobile */
+@media (max-width: 768px) {
+    [data-testid="block-container"] { padding: 1rem 0.5rem !important; }
+    [data-testid="stChatMessage"] .stMarkdown { max-width: 88% !important; }
+}
+</style>""", unsafe_allow_html=True)
+
+# ─── RESOURCE LOADER ──────────────────────────────────────
 @st.cache_resource
 def load_all_resources():
     chunks = []
@@ -63,28 +203,26 @@ def load_all_resources():
         documents    = [c["text"]     for c in chunks]
         ids          = [c["chunk_id"] for c in chunks]
         metadatas    = [{
-            "product_name":    str(c.get("product_name","")),
-            "price_usd":       str(c.get("price_usd","")),
-            "rating":          str(c.get("rating","")),
-            "sentiment_label": str(c.get("sentiment_label","")),
-            "sentiment_score": str(c.get("sentiment_score","")),
-            "category":        str(c.get("category","")),
-            "type":            str(c.get("type","")),
-            "source_url":      str(c.get("source_url","")),
+            "product_name":    str(c.get("product_name", "")),
+            "price_usd":       str(c.get("price_usd", "")),
+            "rating":          str(c.get("rating", "")),
+            "sentiment_label": str(c.get("sentiment_label", "")),
+            "sentiment_score": str(c.get("sentiment_score", "")),
+            "category":        str(c.get("category", "")),
+            "type":            str(c.get("type", "")),
+            "source_url":      str(c.get("source_url", "")),
         } for c in chunks]
         embeddings = embedder_tmp.encode(documents, show_progress_bar=False).tolist()
-        batch_size = 50
-        for i in range(0, len(chunks), batch_size):
+        for i in range(0, len(chunks), 50):
             collection.add(
-                ids=ids[i:i+batch_size],
-                documents=documents[i:i+batch_size],
-                metadatas=metadatas[i:i+batch_size],
-                embeddings=embeddings[i:i+batch_size],
+                ids=ids[i:i+50],
+                documents=documents[i:i+50],
+                metadatas=metadatas[i:i+50],
+                embeddings=embeddings[i:i+50],
             )
 
     embedder  = SentenceTransformer("all-MiniLM-L6-v2")
-    tokenized = [c["text"].lower().split() for c in chunks]
-    bm25      = BM25Okapi(tokenized)
+    bm25      = BM25Okapi([c["text"].lower().split() for c in chunks])
 
     api_key = os.environ.get("GEMINI_API_KEY", "")
     try:
@@ -92,94 +230,63 @@ def load_all_resources():
     except Exception:
         pass
 
-    gemini_client = genai.Client(api_key=api_key) if api_key else None
-    return chunks, collection, embedder, bm25, gemini_client
+    return chunks, collection, embedder, bm25, genai.Client(api_key=api_key) if api_key else None
 
-# ─── FILTER PARSING ───────────────────────────────────────
+# ─── HELPERS ──────────────────────────────────────────────
 def parse_filters(msg):
-    m       = msg.lower()
-    filters = {}
+    m, filters = msg.lower(), {}
     pm = re.search(r'under\s+\$?(\d+)|less\s+than\s+\$?(\d+)|below\s+\$?(\d+)|\$?(\d+)\s+or\s+less', m)
-    if pm:
-        filters["max_price"] = float(next(v for v in pm.groups() if v))
+    if pm: filters["max_price"] = float(next(v for v in pm.groups() if v))
     pm2 = re.search(r'over\s+\$?(\d+)|more\s+than\s+\$?(\d+)|above\s+\$?(\d+)', m)
-    if pm2:
-        filters["min_price"] = float(next(v for v in pm2.groups() if v))
-    if any(w in m for w in ["highly rated","top rated","best rated","4 star","5 star"]):
-        filters["min_rating"] = 4.0
-    if any(w in m for w in ["complaint","problem","issue","bad review","negative"]):
-        filters["sentiment"] = "negative"
-    elif any(w in m for w in ["positive review","recommended","loved","great review"]):
-        filters["sentiment"] = "positive"
-    cats = {
-        "headphone":"wireless headphones","speaker":"bluetooth speakers",
-        "earbud":"wireless earbuds","noise cancel":"noise cancelling headphones",
-        "gaming":"gaming headsets","watch":"smart watches",
-        "keyboard":"wireless keyboards","webcam":"webcams for streaming",
-        "charger":"portable chargers","laptop stand":"laptop stands",
-    }
+    if pm2: filters["min_price"] = float(next(v for v in pm2.groups() if v))
+    if any(w in m for w in ["highly rated","top rated","4 star","5 star"]): filters["min_rating"] = 4.0
+    if any(w in m for w in ["complaint","problem","issue","bad review","negative"]): filters["sentiment"] = "negative"
+    elif any(w in m for w in ["positive review","recommended","loved"]): filters["sentiment"] = "positive"
+    cats = {"headphone":"wireless headphones","speaker":"bluetooth speakers",
+            "earbud":"wireless earbuds","noise cancel":"noise cancelling headphones",
+            "gaming":"gaming headsets","watch":"smart watches","keyboard":"wireless keyboards",
+            "webcam":"webcams for streaming","charger":"portable chargers","laptop stand":"laptop stands"}
     for kw, cat in cats.items():
-        if kw in m:
-            filters["category"] = cat
-            break
+        if kw in m: filters["category"] = cat; break
     return filters
 
-# ─── HYBRID SEARCH ────────────────────────────────────────
 def hybrid_search(query, collection, embedder, bm25, all_chunks, filters):
     qe = embedder.encode([query]).tolist()
     wc = {}
-    if "category"  in filters: wc["category"]        = {"$eq": filters["category"]}
-    if "sentiment" in filters: wc["sentiment_label"]  = {"$eq": filters["sentiment"]}
-    kw = {"query_embeddings": qe,
-          "n_results": min(TOP_K*3, collection.count()),
+    if "category"  in filters: wc["category"]       = {"$eq": filters["category"]}
+    if "sentiment" in filters: wc["sentiment_label"] = {"$eq": filters["sentiment"]}
+    kw = {"query_embeddings": qe, "n_results": min(TOP_K*3, collection.count()),
           "include": ["documents","metadatas","distances"]}
     if wc: kw["where"] = wc
-    try:
-        sr = collection.query(**kw)
-    except Exception:
-        sr = collection.query(query_embeddings=qe,
-                              n_results=min(TOP_K*3,collection.count()),
-                              include=["documents","metadatas","distances"])
+    try:    sr = collection.query(**kw)
+    except: sr = collection.query(query_embeddings=qe, n_results=min(TOP_K*3, collection.count()),
+                                   include=["documents","metadatas","distances"])
     docs, metas, dists = sr["documents"][0], sr["metadatas"][0], sr["distances"][0]
     md = max(dists) if dists else 1
-    ss = {d: 1-(dist/md) for d, dist in zip(docs, dists)}
-
+    combined = {d: {"meta": m, "score": (1-BM25_WEIGHT)*(1-dist/md)}
+                for d, m, dist in zip(docs, metas, dists)}
     br  = bm25.get_scores(query.lower().split())
     mb  = max(br) if max(br) > 0 else 1
     bn  = [s/mb for s in br]
-    tbi = sorted(range(len(bn)), key=lambda i: bn[i], reverse=True)[:TOP_K*3]
-
-    combined = {}
-    for doc, meta, score in zip(docs, metas, ss.values()):
-        combined[doc] = {"meta": meta, "score": (1-BM25_WEIGHT)*score}
-    for idx in tbi:
+    for idx in sorted(range(len(bn)), key=lambda i: bn[i], reverse=True)[:TOP_K*3]:
         doc  = all_chunks[idx]["text"]
         meta = {k: str(v) for k,v in all_chunks[idx].items() if k != "text"}
-        if doc in combined:
-            combined[doc]["score"] += BM25_WEIGHT * bn[idx]
-        else:
-            combined[doc] = {"meta": meta, "score": BM25_WEIGHT * bn[idx]}
-
-    filtered = {}
-    for doc, data in combined.items():
-        price = float(data["meta"].get("price_usd", 0) or 0)
-        if "max_price" in filters and price > 0 and price > filters["max_price"]: continue
-        if "min_price" in filters and price > 0 and price < filters["min_price"]: continue
-        filtered[doc] = data
-    if not filtered: filtered = combined
-
-    return sorted(filtered.items(), key=lambda x: x[1]["score"], reverse=True)[:TOP_K]
+        if doc in combined: combined[doc]["score"] += BM25_WEIGHT * bn[idx]
+        else: combined[doc] = {"meta": meta, "score": BM25_WEIGHT * bn[idx]}
+    filtered = {d: v for d,v in combined.items()
+                if not ("max_price" in filters and float(v["meta"].get("price_usd",0) or 0) > filters["max_price"] > 0)
+                and not ("min_price" in filters and float(v["meta"].get("price_usd",0) or 0) < filters["min_price"] > 0)}
+    return sorted((filtered or combined).items(), key=lambda x: x[1]["score"], reverse=True)[:TOP_K]
 
 def build_context(results):
     parts, seen = [], set()
     for doc, data in results:
-        meta  = data["meta"]
-        name  = meta.get("product_name","Unknown")
-        price = meta.get("price_usd","0")
-        hdr   = ""
+        meta = data["meta"]
+        name = meta.get("product_name","Unknown")
+        hdr  = ""
         if name not in seen:
             seen.add(name)
-            try:    ps = f"USD {float(price):.2f}" if float(price) > 0 else "See site"
+            try:    ps = f"USD {float(meta.get('price_usd',0)):.2f}" if float(meta.get('price_usd',0)) > 0 else "See site"
             except: ps = "See site"
             hdr = (f"Product: {name}\nPrice: {ps} | Rating: {meta.get('rating','N/A')}/5 | "
                    f"Sentiment: {meta.get('sentiment_label','N/A')}\nURL: {meta.get('source_url','')}\n")
@@ -190,120 +297,51 @@ def build_context(results):
 def render_sidebar(collection, all_chunks):
     with st.sidebar:
         st.markdown("""
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.2rem;">
             <div style="width:36px;height:36px;background:linear-gradient(135deg,#6c63ff,#a855f7);
-                        border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">🛍️</div>
+                 border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">🛍️</div>
             <div>
                 <div style="font-size:15px;font-weight:600;color:#f0f0f8;">ShopMind AI</div>
-                <div style="font-size:11px;color:#44445a;">Powered by real Amazon data</div>
+                <div style="font-size:11px;color:#44445a;">Real Amazon data</div>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
+        </div>""", unsafe_allow_html=True)
 
         products = len(set(c.get("product_name","") for c in all_chunks))
-        st.markdown(f"""
-        <div class="stat-grid">
-            <div class="stat-card">
-                <div class="stat-num">{collection.count()}</div>
-                <div class="stat-lbl">Chunks</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-num">{products}</div>
-                <div class="stat-lbl">Products</div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        c1, c2 = st.columns(2)
+        with c1:
+            st.markdown(f'<div class="scard"><div class="snum">{collection.count()}</div>'
+                        f'<div class="slbl">Chunks</div></div>', unsafe_allow_html=True)
+        with c2:
+            st.markdown(f'<div class="scard"><div class="snum">{products}</div>'
+                        f'<div class="slbl">Products</div></div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="sidebar-section">Categories</div>', unsafe_allow_html=True)
-        categories = sorted(set(c.get("category","") for c in all_chunks if c.get("category")))
-        for cat in categories:
-            count = len([c for c in all_chunks if c.get("category") == cat])
-            label = cat.title()
-            if st.button(f"{label}  {count}", key=f"cat_{cat}", use_container_width=True):
+        st.markdown('<div class="slabel">📦 Categories</div>', unsafe_allow_html=True)
+        for cat in sorted(set(c.get("category","") for c in all_chunks if c.get("category"))):
+            count = sum(1 for c in all_chunks if c.get("category") == cat)
+            if st.button(f"{cat.title()}  ·  {count}", key=f"c_{cat}", use_container_width=True):
                 st.session_state.prefill = f"What are the best {cat}?"
 
-        st.markdown('<div class="sidebar-section">Actions</div>', unsafe_allow_html=True)
+        st.markdown('<div class="slabel">💡 Try asking</div>', unsafe_allow_html=True)
+        for q in ["Best noise cancelling for travel",
+                  "Wireless earbuds under $50",
+                  "Gaming headsets with good mic",
+                  "Smartwatch complaints",
+                  "Fast charging portable chargers",
+                  "Webcams for streaming"]:
+            if st.button(q, key=f"q_{q[:15]}", use_container_width=True):
+                st.session_state.prefill = q
+
+        st.markdown('<div class="slabel">⚙️ Actions</div>', unsafe_allow_html=True)
         if st.button("🗑️  Clear conversation", use_container_width=True):
             st.session_state.messages = []
             st.session_state.history  = []
             st.rerun()
 
-        st.markdown("""
-        <div style="margin-top:2rem;padding-top:1rem;border-top:1px solid #2a2a35;">
-            <div style="font-size:10px;color:#2a2a35;font-family:'DM Mono',monospace;line-height:1.8;">
-                scraper · cleaner · chunker<br>
-                chromadb · bm25 · gemini 2.5
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-# ─── RENDER MESSAGES ──────────────────────────────────────
-def render_messages(messages):
-    for i, msg in enumerate(messages):
-        role    = msg["role"]
-        content = msg["content"]
-        ts      = msg.get("time", "")
-
-        if role == "user":
-            st.markdown(f"""
-            <div class="msg-row user">
-                <div class="avatar user-av">U</div>
-                <div class="bubble user-bubble">{content}</div>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            # Show filter badge if present
-            badge_html = ""
-            if msg.get("filters"):
-                parts = []
-                f = msg["filters"]
-                if "max_price"  in f: parts.append(f"💰 Under ${f['max_price']:.0f}")
-                if "min_price"  in f: parts.append(f"💰 Over ${f['min_price']:.0f}")
-                if "category"   in f: parts.append(f"📦 {f['category'].title()}")
-                if "sentiment"  in f: parts.append(f"💬 {f['sentiment'].title()}")
-                if "min_rating" in f: parts.append(f"⭐ {f['min_rating']}+")
-                if parts:
-                    badge_html = f'<div class="filter-badge">🔍 {" · ".join(parts)}</div>'
-
-            st.markdown(f"""
-            <div class="msg-row assistant">
-                <div class="avatar bot-av">🛍️</div>
-                <div style="display:flex;flex-direction:column;gap:4px;">
-                    {badge_html}
-                    <div class="bubble bot-bubble">{content}</div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        # Timestamp every few messages
-        if ts and (i == len(messages)-1 or i % 6 == 0):
-            st.markdown(f'<div class="msg-time">{ts}</div>', unsafe_allow_html=True)
-
-# ─── QUICK CHIPS ──────────────────────────────────────────
-QUICK_CHIPS = [
-    "🎧 Best noise cancelling headphones",
-    "🎮 Gaming headsets under $100",
-    "📱 Wireless earbuds for workouts",
-    "⌚ Highly rated smartwatches",
-    "🔋 Fast charging portable chargers",
-    "📷 Webcams for streaming",
-]
-
-def render_welcome():
-    st.markdown("""
-    <div class="welcome-wrap">
-        <div class="welcome-icon">🛍️</div>
-        <div class="welcome-title">ShopMind AI</div>
-        <div class="welcome-sub">Ask me anything about electronics and gadgets.
-        I search real Amazon data to find what fits your needs and budget.</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    cols = st.columns(3)
-    for i, chip in enumerate(QUICK_CHIPS):
-        with cols[i % 3]:
-            if st.button(chip, key=f"chip_{i}", use_container_width=True):
-                st.session_state.prefill = chip
+        st.markdown("""<div style="margin-top:2rem;font-size:10px;color:#2a2a35;line-height:1.9;">
+            Playwright · pandas · TextBlob<br>
+            ChromaDB · BM25 · Gemini 2.5<br>
+            sentence-transformers · tiktoken
+        </div>""", unsafe_allow_html=True)
 
 # ─── MAIN ─────────────────────────────────────────────────
 def main():
@@ -316,100 +354,108 @@ def main():
     render_sidebar(collection, all_chunks)
 
     if not gemini_client:
-        st.error("⚠️ GEMINI_API_KEY not configured.")
+        st.error("GEMINI_API_KEY not set.")
         return
-
-    # ── Main chat layout ──
-    st.markdown('<div class="chat-wrapper">', unsafe_allow_html=True)
 
     # Header
     st.markdown("""
-    <div class="chat-header">
-        <div class="chat-header-logo">🛍️</div>
-        <div class="chat-header-text">
-            <h1>ShopMind AI</h1>
-            <p><span class="online-dot"></span>Online · Real Amazon data · Hybrid search</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Messages area
-    st.markdown('<div class="messages-area" id="msgs">', unsafe_allow_html=True)
-
-    if not st.session_state.messages:
-        render_welcome()
-    else:
-        render_messages(st.session_state.messages)
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # Input
-    st.markdown('<div class="input-area">', unsafe_allow_html=True)
-    prefill_val = st.session_state.pop("prefill", "")
-    user_input  = st.chat_input(
-        "Ask about any product — price, features, reviews...",
-        key="chat_input"
-    ) or prefill_val
-    st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # ── Process message ──
-    if user_input:
-        ts      = time.strftime("%I:%M %p")
-        filters = parse_filters(user_input)
-
-        st.session_state.messages.append({
-            "role": "user", "content": user_input, "time": ts
-        })
-
-        # Show thinking dots
-        thinking = st.empty()
-        thinking.markdown("""
-        <div class="thinking-row">
-            <div class="avatar bot-av">🛍️</div>
-            <div class="thinking-bubble">
-                <div class="tdot"></div>
-                <div class="tdot"></div>
-                <div class="tdot"></div>
+    <div style="display:flex;align-items:center;gap:12px;padding-bottom:1rem;
+         border-bottom:1px solid #2a2a35;margin-bottom:1.5rem;">
+        <div style="width:40px;height:40px;background:linear-gradient(135deg,#6c63ff,#a855f7);
+             border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;">🛍️</div>
+        <div>
+            <div style="font-size:18px;font-weight:600;color:#f0f0f8;letter-spacing:-0.02em;">ShopMind AI</div>
+            <div style="font-size:12px;color:#6b6b80;">
+                <span style="display:inline-block;width:7px;height:7px;background:#22c55e;
+                border-radius:50%;margin-right:5px;"></span>
+                Online · 619 chunks · Hybrid search
             </div>
         </div>
-        """, unsafe_allow_html=True)
+    </div>""", unsafe_allow_html=True)
 
-        # Retrieve + generate
-        results = hybrid_search(user_input, collection, embedder, bm25, all_chunks, filters)
-        context = build_context(results) if results else "No relevant products found."
+    # Welcome screen
+    if not st.session_state.messages:
+        st.markdown("""
+        <div class="welcome">
+            <h2>What can I help you find?</h2>
+            Ask about any product — price, features, reviews, or comparisons.<br>
+            I search real Amazon data using semantic + keyword hybrid search.
+        </div>""", unsafe_allow_html=True)
 
-        history_text = ""
-        for msg in st.session_state.history[-4:]:
-            role          = "User" if msg["role"] == "user" else "Assistant"
-            history_text += f"{role}: {msg['content']}\n\n"
+    # Render chat history
+    for msg in st.session_state.messages:
+        role = msg["role"]
+        with st.chat_message(role, avatar="👤" if role=="user" else "🛍️"):
+            if role == "assistant" and msg.get("filters"):
+                f      = msg["filters"]
+                parts  = []
+                if "max_price"  in f: parts.append(f"💰 Under ${f['max_price']:.0f}")
+                if "min_price"  in f: parts.append(f"💰 Over ${f['min_price']:.0f}")
+                if "category"   in f: parts.append(f"📦 {f['category'].title()}")
+                if "sentiment"  in f: parts.append(f"💬 {f['sentiment'].title()}")
+                if "min_rating" in f: parts.append(f"⭐ {f['min_rating']}+")
+                if parts:
+                    st.markdown(f'<div class="fbadge">🔍 {" · ".join(parts)}</div>',
+                                unsafe_allow_html=True)
+            st.markdown(msg["content"])
 
-        full_prompt = (
-            f"{SYSTEM_PROMPT}\n\n"
-            f"{history_text}"
-            f"Product data:\n\n{context}\n\n"
-            f"---\nUser: {user_input}\nAssistant:"
-        )
+    # Input
+    prefill    = st.session_state.pop("prefill", "")
+    user_input = st.chat_input("Ask about any product...", key="chat_input") or prefill
 
-        try:
-            response        = gemini_client.models.generate_content(
-                model=GEMINI_MODEL, contents=full_prompt)
-            assistant_reply = response.text or "I couldn't generate a response."
-        except Exception as e:
-            assistant_reply = f"Sorry, I hit an error: {e}"
+    if user_input:
+        filters = parse_filters(user_input)
+        st.session_state.messages.append({"role":"user","content":user_input})
+        st.session_state.history.append({"role":"user","content":user_input})
 
-        thinking.empty()
+        with st.chat_message("user", avatar="👤"):
+            st.markdown(user_input)
+
+        with st.chat_message("assistant", avatar="🛍️"):
+            # Filter badge
+            if filters:
+                parts = []
+                if "max_price"  in filters: parts.append(f"💰 Under ${filters['max_price']:.0f}")
+                if "min_price"  in filters: parts.append(f"💰 Over ${filters['min_price']:.0f}")
+                if "category"   in filters: parts.append(f"📦 {filters['category'].title()}")
+                if "sentiment"  in filters: parts.append(f"💬 {filters['sentiment'].title()}")
+                if "min_rating" in filters: parts.append(f"⭐ {filters['min_rating']}+")
+                if parts:
+                    st.markdown(f'<div class="fbadge">🔍 {" · ".join(parts)}</div>',
+                                unsafe_allow_html=True)
+
+            # Thinking dots
+            thinking = st.empty()
+            thinking.markdown("""
+            <div class="tdots">
+                <div class="tdot"></div>
+                <div class="tdot"></div>
+                <div class="tdot"></div>
+            </div>""", unsafe_allow_html=True)
+
+            # Retrieve + generate
+            results = hybrid_search(user_input, collection, embedder, bm25, all_chunks, filters)
+            context = build_context(results) if results else "No relevant products found."
+
+            history_text = ""
+            for m in st.session_state.history[-4:]:
+                history_text += f"{'User' if m['role']=='user' else 'Assistant'}: {m['content']}\n\n"
+
+            prompt = (f"{SYSTEM_PROMPT}\n\n{history_text}"
+                      f"Product data:\n\n{context}\n\n---\nUser: {user_input}\nAssistant:")
+            try:
+                resp   = gemini_client.models.generate_content(model=GEMINI_MODEL, contents=prompt)
+                reply  = resp.text or "I could not generate a response."
+            except Exception as e:
+                reply  = f"Error: {e}"
+
+            thinking.empty()
+            st.markdown(reply)
 
         st.session_state.messages.append({
-            "role":    "assistant",
-            "content": assistant_reply,
-            "filters": filters if filters else None,
-            "time":    time.strftime("%I:%M %p"),
+            "role":"assistant","content":reply,"filters":filters or None
         })
-        st.session_state.history.append({"role": "user",      "content": user_input})
-        st.session_state.history.append({"role": "assistant", "content": assistant_reply})
-
-        st.rerun()
+        st.session_state.history.append({"role":"assistant","content":reply})
 
 if __name__ == "__main__":
     main()
