@@ -1,0 +1,1 @@
+pip freeze | Select-String -Pattern "streamlit|chromadb|sentence|google-generativeai|rank.bm25|playwright|pandas|tiktoken|textblob|anthropic" | Out-File -FilePath requirements.txt -Encoding utf8

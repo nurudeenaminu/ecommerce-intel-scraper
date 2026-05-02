@@ -1,0 +1,174 @@
+{
+  "total_questions": 10,
+  "passed": 8,
+  "pass_rate": "80%",
+  "average_score": "65%",
+  "per_question": [
+    {
+      "id": 1,
+      "question": "What Sony noise cancelling headphones do you have?",
+      "category": "product lookup",
+      "expected_keywords": [
+        "sony",
+        "noise cancel"
+      ],
+      "matched_keywords": [
+        "sony"
+      ],
+      "score": 0.5,
+      "passed": true,
+      "answer_preview": "I do not have data for any Sony noise-cancelling headphones. The provided product data includes headphones from Soundcore by Anker, BERIBES, MZYMI, KVIDIO, and one with a generic title."
+    },
+    {
+      "id": 2,
+      "question": "Show me wireless earbuds under $50",
+      "category": "price filter",
+      "expected_keywords": [
+        "earbud",
+        "dollar",
+        "50"
+      ],
+      "matched_keywords": [
+        "earbud",
+        "50"
+      ],
+      "score": 0.67,
+      "passed": true,
+      "answer_preview": "Based on the product data provided, there are no wireless earbuds listed with a price explicitly under $50. The JLab JBuds Lux ANC Headphones are over-ear and a review mentions them being $50. All other earbud products list \"See site\" for pricing."
+    },
+    {
+      "id": 3,
+      "question": "What are customers complaining about with gaming headsets?",
+      "category": "sentiment \u2014 negative",
+      "expected_keywords": [
+        "gaming",
+        "sound",
+        "comfort"
+      ],
+      "matched_keywords": [],
+      "score": 0.0,
+      "passed": false,
+      "answer_preview": "Some customers have expressed mixed feelings about the plastic material used in Razer Kraken V3 X, perceiving its quality as compromised for lightweight design."
+    },
+    {
+      "id": 4,
+      "question": "Which portable charger has the best reviews?",
+      "category": "product rating",
+      "expected_keywords": [
+        "charger",
+        "rating",
+        "review"
+      ],
+      "matched_keywords": [
+        "charger",
+        "rating",
+        "review"
+      ],
+      "score": 1.0,
+      "passed": true,
+      "answer_preview": "The \"[2 Pack]Mini Portable Charger USB-C Power Bank 5200mAh\" has the best reviews among the portable chargers with a rating of 4.5/5."
+    },
+    {
+      "id": 5,
+      "question": "Tell me about the battery life of wireless headphones",
+      "category": "feature query",
+      "expected_keywords": [
+        "battery",
+        "hour",
+        "life"
+      ],
+      "matched_keywords": [
+        "battery",
+        "hour",
+        "life"
+      ],
+      "score": 1.0,
+      "passed": true,
+      "answer_preview": "Based on the product data provided:\n\n*   **Raycon Impact Earbuds**: Offers 90 hours of total battery life with the charging case. The earbuds themselves provide 9 hours of charge, and the case holds 5 days of charge.\n*   **Status Between 3ANC Onyx True Active Noise Cancelling Wireless Earbuds**: Pro"
+    },
+    {
+      "id": 6,
+      "question": "What webcams do you have for streaming?",
+      "category": "category filter",
+      "expected_keywords": [
+        "webcam",
+        "stream",
+        "camera"
+      ],
+      "matched_keywords": [
+        "webcam",
+        "stream"
+      ],
+      "score": 0.67,
+      "passed": true,
+      "answer_preview": "We have the following webcams that support streaming:\n\n*   **Logitech C922x HD Pro PC Webcam**: Offers Full HD 1080p/30fps or 720p/60fps video, HD Light Correction, and works with Microsoft Teams, Google Meet, Zoom, and Nintendo Switch 2's new GameChat mode. The review highlights its suitability for"
+    },
+    {
+      "id": 7,
+      "question": "Are there any highly rated smart watches?",
+      "category": "rating filter",
+      "expected_keywords": [
+        "watch",
+        "rating",
+        "star"
+      ],
+      "matched_keywords": [],
+      "score": 0.0,
+      "passed": false,
+      "answer_preview": "ERROR: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-"
+    },
+    {
+      "id": 8,
+      "question": "What do customers love about bluetooth speakers?",
+      "category": "sentiment \u2014 positive",
+      "expected_keywords": [
+        "speaker",
+        "sound",
+        "bluetooth"
+      ],
+      "matched_keywords": [
+        "speaker",
+        "bluetooth"
+      ],
+      "score": 0.67,
+      "passed": true,
+      "answer_preview": "Based on the product data provided, there is no information about customer sentiment regarding Bluetooth speakers."
+    },
+    {
+      "id": 9,
+      "question": "Do you have any wireless keyboards for mac?",
+      "category": "category + use case",
+      "expected_keywords": [
+        "keyboard",
+        "wireless",
+        "mac"
+      ],
+      "matched_keywords": [
+        "keyboard",
+        "wireless",
+        "mac"
+      ],
+      "score": 1.0,
+      "passed": true,
+      "answer_preview": "Yes, the following wireless keyboards are compatible with Mac:\n\n*   **Wireless Keyboard and Mouse Combo:** Compatible with Mac OS.\n*   **TECKNET Bluetooth Keyboard Rechargeable:** Features layout support for both Mac and Windows and works with Macbooks.\n*   **KLIM Chroma Wireless Keyboard RGB Backli"
+    },
+    {
+      "id": 10,
+      "question": "What is the cheapest laptop stand in your data?",
+      "category": "price ranking",
+      "expected_keywords": [
+        "stand",
+        "laptop",
+        "price"
+      ],
+      "matched_keywords": [
+        "stand",
+        "laptop",
+        "price"
+      ],
+      "score": 1.0,
+      "passed": true,
+      "answer_preview": "The price for all listed laptop stands is \"See site,\" so it's not possible to determine the cheapest from the provided data."
+    }
+  ]
+}
