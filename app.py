@@ -445,36 +445,59 @@ def main():
                     unsafe_allow_html=True
                 )
 
-            with st.spinner("Searching products..."):
-                # Retrieve
-                results = hybrid_search(
-                    user_input, collection, embedder,
-                    bm25, all_chunks, filters
+            # Animated thinking dots placeholder
+            thinking_placeholder = st.empty()
+            thinking_placeholder.markdown("""
+            <div style="display:flex; align-items:center; gap:4px; padding:8px 0;">
+                <span style="font-size:13px; color:var(--text-color); opacity:0.6;">Thinking</span>
+                <style>
+                    .dot { display:inline-block; width:6px; height:6px; border-radius:50%;
+                        background:currentColor; opacity:0.4;
+                        animation: blink 1.2s infinite; }
+                    .dot:nth-child(2){ animation-delay:0.2s; }
+                    .dot:nth-child(3){ animation-delay:0.4s; }
+                    @keyframes blink {
+                        0%,80%,100%{ opacity:0.2; transform:scale(0.8); }
+                        40%{ opacity:1; transform:scale(1.1); }
+                    }
+                </style>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+            """, unsafe_allow_html=True)
+
+            # Retrieve
+            results = hybrid_search(
+                user_input, collection, embedder,
+                bm25, all_chunks, filters
+            )
+            context = build_context(results) if results else "No relevant products found."
+
+            # Build prompt with recent history only
+            history_text = ""
+            for msg in st.session_state.history[-4:]:
+                role = "User" if msg["role"] == "user" else "Assistant"
+                history_text += f"{role}: {msg['content']}\n\n"
+
+            full_prompt = (
+                f"{SYSTEM_PROMPT}\n\n"
+                f"{history_text}"
+                f"Product data:\n\n{context}\n\n"
+                f"---\nUser: {user_input}\nAssistant:"
+            )
+
+            try:
+                response        = gemini_model.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=full_prompt,
                 )
-                context = build_context(results) if results else "No relevant products found."
+                assistant_reply = response.text or "I couldn't generate a response."
+            except Exception as e:
+                assistant_reply = f"Sorry, I encountered an error: {e}"
 
-                # Build conversation history as prompt context
-                history_text = ""
-                for msg in st.session_state.history[-6:]:  # last 3 turns for memory
-                    role = "User" if msg["role"] == "user" else "Assistant"
-                    history_text += f"{role}: {msg['content']}\n\n"
-
-                full_prompt = (
-                    f"{SYSTEM_PROMPT}\n\n"
-                    f"{history_text}"
-                    f"Product data from our database:\n\n{context}\n\n"
-                    f"---\nUser: {user_input}\nAssistant:"
-                )
-
-                try:
-                    response        = gemini_model.models.generate_content(
-                        model="gemini-2.5-flash",
-                        contents=full_prompt,
-                    )
-                    assistant_reply = response.text or "I couldn't generate a response."
-                except Exception as e:
-                    assistant_reply = f"Sorry, I encountered an error: {e}"
-
+            # Clear thinking dots and show response
+            thinking_placeholder.empty()
             st.markdown(assistant_reply)
 
         # Update session state
