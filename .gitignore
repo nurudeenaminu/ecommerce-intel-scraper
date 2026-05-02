@@ -1,65 +1,23 @@
-﻿# ─── Virtual environments ─────────────────────────────────
-.venv/
+﻿.venv/
 venv/
 env/
-ENV/
-
-# ─── API keys and secrets ─────────────────────────────────
 .env
-.env.*
+.env.local
+.env.production
 *.env
-.streamlit/secrets.toml
+.streamlit/
 secrets.toml
-**/secrets.toml
-config.ini
-credentials.json
-service_account.json
-replacement.txt
-
-# ─── Data files (too large for GitHub) ───────────────────
+chroma_db/
 data/raw/
 data/cleaned/
-
-# ─── Vector store (rebuilt from chunks) ──────────────────
-chroma_db/
-
-# ─── Debug files from scraper ────────────────────────────
 debug_*.png
 debug_*.html
-
-# ─── Python cache ────────────────────────────────────────
 __pycache__/
-*.py[cod]
-*.pyo
+*.pyc
 *.pyd
-.Python
-
-# ─── Build artifacts ─────────────────────────────────────
-build/
-dist/
-*.egg-info/
-.eggs/
-
-# ─── Jupyter ─────────────────────────────────────────────
-.ipynb_checkpoints/
-*.ipynb
-
-# ─── OS files ────────────────────────────────────────────
 .DS_Store
 Thumbs.db
-desktop.ini
-
-# ─── IDE files ───────────────────────────────────────────
 .vscode/
 .idea/
-*.suo
-*.user
-
-# ─── Logs ────────────────────────────────────────────────
 *.log
-logs/
-
-# ─── Test artifacts ──────────────────────────────────────
-.pytest_cache/
-.coverage
-htmlcov/
+replacement.txt
