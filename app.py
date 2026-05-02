@@ -453,21 +453,25 @@ def main():
                 )
                 context = build_context(results) if results else "No relevant products found."
 
-                # Build Gemini history
-                gemini_history = []
-                for msg in st.session_state.history:
-                    role = "user" if msg["role"] == "user" else "model"
-                    gemini_history.append({"role": role, "parts": [msg["content"]]})
+                # Build conversation history as prompt context
+                history_text = ""
+                for msg in st.session_state.history[-6:]:  # last 3 turns for memory
+                    role = "User" if msg["role"] == "user" else "Assistant"
+                    history_text += f"{role}: {msg['content']}\n\n"
 
-                chat_session = gemini_model.start_chat(history=gemini_history)
-                full_message = (
+                full_prompt = (
+                    f"{SYSTEM_PROMPT}\n\n"
+                    f"{history_text}"
                     f"Product data from our database:\n\n{context}\n\n"
-                    f"---\nUser question: {user_input}"
+                    f"---\nUser: {user_input}\nAssistant:"
                 )
 
                 try:
-                    response       = chat_session.send_message(full_message)
-                    assistant_reply = response.text
+                    response        = gemini_model.models.generate_content(
+                        model="gemini-2.5-flash",
+                        contents=full_prompt,
+                    )
+                    assistant_reply = response.text or "I couldn't generate a response."
                 except Exception as e:
                     assistant_reply = f"Sorry, I encountered an error: {e}"
 
