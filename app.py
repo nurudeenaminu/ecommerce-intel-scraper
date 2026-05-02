@@ -103,9 +103,50 @@ def load_all_resources():
             if line:
                 chunks.append(json.loads(line))
 
-    # ChromaDB
-    client     = chromadb.PersistentClient(path=CHROMA_PATH)
-    collection = client.get_collection(COLLECTION_NAME)
+    # ChromaDB — rebuild if collection missing or corrupt
+    client = chromadb.PersistentClient(path=CHROMA_PATH)
+    try:
+        collection = client.get_collection(COLLECTION_NAME)
+        # Verify it has data
+        if collection.count() == 0:
+            raise ValueError("Empty collection")
+    except Exception:
+        st.info("Building search index for first time... (~2 min)")
+        # Delete and recreate
+        try:
+            client.delete_collection(COLLECTION_NAME)
+        except Exception:
+            pass
+
+        collection = client.create_collection(name=COLLECTION_NAME)
+        embedder_temp = SentenceTransformer("all-MiniLM-L6-v2")
+
+        documents = [c["text"] for c in chunks]
+        ids       = [c["chunk_id"] for c in chunks]
+        metadatas = [
+            {
+                "product_name":           str(c.get("product_name", "")),
+                "price_usd":              str(c.get("price_usd", "")),
+                "rating":                 str(c.get("rating", "")),
+                "sentiment_label":        str(c.get("sentiment_label", "")),
+                "sentiment_score":        str(c.get("sentiment_score", "")),
+                "category":               str(c.get("category", "")),
+                "type":                   str(c.get("type", "")),
+                "source_url":             str(c.get("source_url", "")),
+            }
+            for c in chunks
+        ]
+
+        embeddings = embedder_temp.encode(documents, show_progress_bar=False).tolist()
+
+        batch_size = 50
+        for i in range(0, len(chunks), batch_size):
+            collection.add(
+                ids=ids[i:i+batch_size],
+                documents=documents[i:i+batch_size],
+                metadatas=metadatas[i:i+batch_size],
+                embeddings=embeddings[i:i+batch_size],
+            )
 
     # Embedder
     embedder = SentenceTransformer("all-MiniLM-L6-v2")
@@ -116,16 +157,17 @@ def load_all_resources():
 
     # Gemini
     api_key = os.environ.get("GEMINI_API_KEY", "")
-    if api_key:
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel(
-            model_name="gemini-2.5-flash",
-            system_instruction=SYSTEM_PROMPT,
-        )
-    else:
-        model = None
+    try:
+        api_key = st.secrets.get("GEMINI_API_KEY", api_key)
+    except Exception:
+        pass
 
-    return chunks, collection, embedder, bm25, model
+    if api_key:
+        gemini_client = genai.Client(api_key=api_key)
+    else:
+        gemini_client = None
+
+    return chunks, collection, embedder, bm25, gemini_client
 
 # ─── FILTER PARSING ───────────────────────────────────────
 def parse_filters(user_message):
