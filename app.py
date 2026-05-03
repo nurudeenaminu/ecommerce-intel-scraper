@@ -218,17 +218,19 @@ def main():
         return
 
     # Header
-    st.markdown("""
+    chunk_count = collection.count()
+    product_count = len(set(c.get("product_name","") for c in all_chunks))
+    st.markdown(f"""
     <div style="display:flex;align-items:center;gap:12px;padding-bottom:1rem;
-         border-bottom:1px solid #2a2a35;margin-bottom:1.5rem;">
+        border-bottom:1px solid #2a2a35;margin-bottom:1.5rem;">
         <div style="width:40px;height:40px;background:linear-gradient(135deg,#6c63ff,#a855f7);
-             border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;">🛍️</div>
+            border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;">🛍️</div>
         <div>
             <div style="font-size:18px;font-weight:600;color:#f0f0f8;letter-spacing:-0.02em;">ShopMind AI</div>
             <div style="font-size:12px;color:#6b6b80;">
                 <span style="display:inline-block;width:7px;height:7px;background:#22c55e;
                 border-radius:50%;margin-right:5px;"></span>
-                Online · 619 chunks · Hybrid search
+                Online · {chunk_count} chunks · {product_count} products · Hybrid search
             </div>
         </div>
     </div>""", unsafe_allow_html=True)

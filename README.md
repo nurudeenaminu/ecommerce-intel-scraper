@@ -1,13 +1,14 @@
-# 🛍️ E-Commerce Intelligence Scraper → RAG-Ready Pipeline
+# 🛍️ ShopMind AI — E-Commerce Intelligence Scraper → RAG Pipeline
 
 > An end-to-end data pipeline that scrapes real Amazon product listings and reviews,
-> cleans and enriches the data with sentiment analysis, chunks it into AI-ready segments,
-> and powers a semantic chatbot with hybrid search — all deployed as a live web application.
+> enriches them with sentiment analysis, chunks into AI-ready segments, and powers
+> a semantic chatbot with hybrid search — deployed as a live web application.
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python)](https://python.org)
-[![Streamlit](https://img.shields.io/badge/Streamlit-Live%20Demo-red?logo=streamlit)](https://share.streamlit.io)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Live%20Demo-red?logo=streamlit)](https://ecommerce-intel-scraper.streamlit.app)
 [![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector%20Store-purple)](https://trychroma.com)
 [![Gemini](https://img.shields.io/badge/Gemini-2.5%20Flash-green?logo=google)](https://ai.google.dev)
+[![Eval](https://img.shields.io/badge/Eval-90%25%20Pass%20Rate-brightgreen)](#-evaluation-results)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
 ---
@@ -21,74 +22,67 @@ data pipeline **before they can write a single line of AI logic.**
 Most scrapers stop at raw data collection. This pipeline goes the full distance:
 
 ```
-Raw Amazon Pages → Structured, Enriched, AI-Ready Data → Working Semantic Chatbot
+Raw Amazon Pages → Structured + Enriched Data → AI-Ready Chunks → Working Semantic Chatbot
 ```
-
-This is the exact infrastructure clients building RAG applications, e-commerce AI tools,
-or product intelligence systems need — delivered as a complete, deployable project.
 
 ---
 
 ## 🏗️ Architecture
 
-```
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                    E-COMMERCE INTELLIGENCE RAG PIPELINE                      ║
-╠══════════════════════════════════════════════════════════════════════════════╣
-║                                                                              ║
-║   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌──────────┐  ║
-║   │  AMAZON.COM │     │  scraper.py │     │  cleaner.py │     │chunker.py│  ║
-║   │             │────▶│             │────▶│             │────▶│          │  ║
-║   │ 10 product  │     │  Playwright │     │   pandas +  │     │ tiktoken │  ║
-║   │ categories  │     │  + Stealth  │     │   TextBlob  │     │ ~500 tok │  ║
-║   │ 5 pages ea  │     │  UA rotate  │     │  sentiment  │     │ overlap  │  ║
-║   │             │     │  retry+back │     │  spam filter│     │ metadata │  ║
-║   └─────────────┘     └─────────────┘     └─────────────┘     └────┬─────┘  ║
-║                                                                     │        ║
-║        ┌────────────────────────────────────────────────────────────┘        ║
-║        ▼                                                                     ║
-║   ┌─────────────┐     ┌─────────────────────────────────────────────────┐   ║
-║   │  loader.py  │     │              VECTOR STORE (ChromaDB)             │   ║
-║   │             │────▶│                                                  │   ║
-║   │ sentence-   │     │  619 chunks · 10 categories · metadata filters  │   ║
-║   │ transformers│     │  all-MiniLM-L6-v2 embeddings                    │   ║
-║   │ embeddings  │     │                                                  │   ║
-║   └─────────────┘     └──────────────────┬──────────────────────────────┘   ║
-║                                          │                                   ║
-║        ┌─────────────────────────────────┘                                   ║
-║        ▼                                                                     ║
-║   ┌─────────────────────────────────────────────────────────────────────┐   ║
-║   │                      HYBRID SEARCH ENGINE                            │   ║
-║   │                                                                      │   ║
-║   │   Semantic Search (ChromaDB, 70%) + Keyword Search (BM25, 30%)      │   ║
-║   │   + Metadata filtering (price · rating · sentiment · category)      │   ║
-║   └──────────────────────────────┬──────────────────────────────────────┘   ║
-║                                  │                                           ║
-║        ┌─────────────────────────┘                                           ║
-║        ▼                                                                     ║
-║   ┌──────────────┐     ┌──────────────┐     ┌──────────────────────────┐   ║
-║   │  chatbot.py  │     │    app.py    │     │      evaluate.py          │   ║
-║   │              │     │              │     │                           │   ║
-║   │  CLI chatbot │     │  Streamlit   │     │  10 Q&A test pairs        │   ║
-║   │  with conv.  │────▶│  Web UI      │     │  80% pass rate            │   ║
-║   │  memory      │     │  live deploy │     │  65% avg score            │   ║
-║   │  Gemini 2.5  │     │  + sidebar   │     │  keyword scoring          │   ║
-║   └──────────────┘     └──────────────┘     └──────────────────────────┘   ║
-║                                                                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+```mermaid
+flowchart TD
+    A[("🌐 Amazon.com\n10 Categories\n5 Pages each")] -->|Playwright + Stealth| B
+
+    subgraph SCRAPER ["📡 scraper.py"]
+        B["User-Agent Rotation\nExponential Backoff\nProxy-Ready Stub\nASIN Extraction"]
+    end
+
+    subgraph CLEANER ["🧹 cleaner.py"]
+        C["HTML Stripping\nPrice Normalization\nASIN Deduplication\nSpam Review Filter\nTextBlob Sentiment"]
+    end
+
+    subgraph CHUNKER ["✂️ chunker.py"]
+        D["tiktoken ~500 tokens\n50-token overlap\nMetadata on every chunk\nJSONL output"]
+    end
+
+    subgraph VECTORSTORE ["🗄️ ChromaDB"]
+        E["665 chunks indexed\nall-MiniLM-L6-v2\nembeddings\nMetadata filters"]
+    end
+
+    subgraph RETRIEVAL ["🔍 Hybrid Search"]
+        F["Semantic Search 70%\n+\nBM25 Keyword 30%\n+\nMetadata Filters\nprice · rating · sentiment · category"]
+    end
+
+    subgraph LLM ["🤖 Gemini 2.5 Flash"]
+        G["Conversation Memory\nGrounded Answers\nHonest Failure Handling"]
+    end
+
+    B --> C --> D --> E --> F --> G
+
+    G --> H["💬 chatbot.py\nCLI Interface"]
+    G --> I["🌐 app.py\nStreamlit Web UI\nLive Deploy"]
+    G --> J["📊 evaluate.py\n90% Pass Rate\n80% Avg Score"]
+
+    style SCRAPER fill:#1a1a2e,stroke:#6c63ff,color:#e8e8f0
+    style CLEANER fill:#1a1a2e,stroke:#22c55e,color:#e8e8f0
+    style CHUNKER fill:#1a1a2e,stroke:#f59e0b,color:#e8e8f0
+    style VECTORSTORE fill:#1a1a2e,stroke:#a855f7,color:#e8e8f0
+    style RETRIEVAL fill:#1a1a2e,stroke:#60a5fa,color:#e8e8f0
+    style LLM fill:#1a1a2e,stroke:#f43f5e,color:#e8e8f0
 ```
 
 ---
 
 ## 🚀 Live Demo
 
-**[→ Try the chatbot live on Streamlit Cloud](https://share.streamlit.io)**
+**[→ Try the chatbot live on Streamlit Cloud](https://ecommerce-intel-scraper.streamlit.app)**
 
 Example questions to try:
 - *"What are the best noise cancelling headphones for travel?"*
 - *"Show me wireless earbuds under $50 with positive reviews"*
 - *"What are customers complaining about with gaming headsets?"*
 - *"Which portable charger has the highest rating?"*
+- *"Webcams good for streaming?"*
 
 ---
 
@@ -97,14 +91,13 @@ Example questions to try:
 | Metric | Value |
 |---|---|
 | Product categories | 10 |
-| Total products scraped | ~120 |
-| Total chunks indexed | 619 |
+| Total chunks indexed | 665 |
 | Chunk size | ~500 tokens |
 | Chunk overlap | 50 tokens |
 | Embedding model | all-MiniLM-L6-v2 |
 | Vector store | ChromaDB (persistent) |
 
-**Categories covered:** Wireless Headphones · Bluetooth Speakers · Wireless Earbuds ·
+**Categories:** Wireless Headphones · Bluetooth Speakers · Wireless Earbuds ·
 Noise Cancelling Headphones · Gaming Headsets · Smart Watches · Wireless Keyboards ·
 Webcams for Streaming · Portable Chargers · Laptop Stands
 
@@ -140,11 +133,12 @@ ecommerce-intel-scraper/
 ├── loader.py           # ChromaDB ingestion + hybrid BM25 index
 ├── chatbot.py          # CLI RAG chatbot with conversation memory
 ├── app.py              # Streamlit web application
+├── style.css           # App stylesheet
 ├── evaluate.py         # Pipeline evaluation script
 ├── data/
-│   ├── raw/            # products_raw.json        (scraper output)
-│   ├── cleaned/        # products_clean.csv       (cleaner output)
-│   └── chunks/         # products_chunks.jsonl    (chunker output)
+│   ├── raw/            # products_raw.json
+│   ├── cleaned/        # products_clean.csv
+│   └── chunks/         # products_chunks.jsonl  ← 665 chunks
 ├── chroma_db/          # Persistent vector store
 ├── eval_results.json   # Evaluation output
 ├── requirements.txt
@@ -218,45 +212,43 @@ Every line in `products_chunks.jsonl` is a self-contained JSON object:
 }
 ```
 
-Every chunk carries full product context — price, rating, sentiment, ASIN, category,
-and source URL — so any downstream RAG system has everything it needs without a database join.
-
 ---
 
 ## 🧪 Evaluation Results
 
-Tested against 10 hand-written question-answer pairs covering all major query types.
+Tested against 10 hand-written Q&A pairs covering all major query types.
+Evaluated with Gemini 2.5 Flash using keyword-based scoring.
 
 | Metric | Result |
 |---|---|
 | Questions tested | 10 |
-| Pass rate (≥50% keyword match) | **80%** |
-| Average keyword score | **65%** |
+| **Pass rate (≥50% keyword match)** | **90%** |
+| **Average keyword score** | **80%** |
 | Model | Gemini 2.5 Flash |
+| Chunks indexed | 665 |
 
 | Category | Score | Status |
 |---|---|---|
-| Product rating queries | 100% | ✅ |
+| Product lookup | 100% | ✅ |
 | Feature queries | 100% | ✅ |
 | Category + use case | 100% | ✅ |
+| Category filter | 100% | ✅ |
 | Price ranking | 100% | ✅ |
 | Price filter | 67% | ✅ |
-| Category filter | 67% | ✅ |
+| Product rating | 67% | ✅ |
+| Rating filter | 67% | ✅ |
 | Sentiment positive | 67% | ✅ |
-| Product lookup | 50% | ✅ |
-| Sentiment negative | 0% | ❌ |
-| Rating filter | 0% | ❌ |
+| Sentiment negative | 33% | ❌ |
 
-**Notes on failures:**
-- Q7 (rating filter) failed due to Gemini free-tier rate limiting (429), not a retrieval failure
-- Q3 (sentiment negative) returned correct gaming headset content but keyword matching
-  was strict — retrieval was accurate, the scoring heuristic did not match the phrasing
+**Note on the one failure:** Sentiment negative (Q3) retrieved correct gaming headset
+content but the product data had no explicit customer complaints in the review text —
+a data coverage issue, not a retrieval failure.
 
 ---
 
 ## 🔌 Extending the Pipeline
 
-**Swap the vector store** — JSONL output is format-agnostic:
+**Swap the vector store:**
 ```python
 # Pinecone
 index.upsert(vectors=[(id, embedding, metadata)])
@@ -267,7 +259,7 @@ client.upsert(collection_name="products", points=[...])
 
 **Add more categories** — edit `SEARCH_QUERIES` in `scraper.py`:
 ```python
-SEARCH_QUERIES = ["gaming mice", "mechanical keyboards", "studio monitors"]
+SEARCH_QUERIES = ["gaming mice", "studio monitors", "mechanical keyboards"]
 ```
 
 **Connect to any LLM:**
@@ -307,7 +299,7 @@ response = anthropic_client.messages.create(model="claude-opus-4-5", messages=me
 ## 👤 Author
 
 **Nurudeen Aminu**
-[GitHub](https://github.com/nurudeenaminu) · [Upwork](https://upwork.com) · [Linkedin](linkedin.com/in/amnurudeen)
+[GitHub](https://github.com/nurudeenaminu) · [Upwork](https://upwork.com)
 
 > Built to demonstrate the complete data value chain:
 > **collection → cleaning → enrichment → AI-ready structuring → semantic retrieval → deployed product**
