@@ -152,7 +152,16 @@ async def scrape_amazon():
                 if proxy:
                     context_args["proxy"] = proxy
 
-                context = await browser.new_context(**context_args)
+                context = await browser.new_context(
+                    user_agent=ua,
+                    viewport={"width": 1280, "height": 800},
+                    locale="en-US",
+                    timezone_id="America/New_York",
+                    extra_http_headers={
+                        "Accept-Language": "en-US,en;q=0.9",
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    }
+            )
                 await context.add_init_script("""
                     Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
                     Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
@@ -160,12 +169,37 @@ async def scrape_amazon():
                     window.chrome = { runtime: {} };
                 """)
                 page = await context.new_page()
+
+                # Block location detection
+                await page.route("**/*geolocation*", lambda route: route.abort())
+                await page.route("**/*location*", lambda route: route.abort())
+
                 await Stealth().apply_stealth_async(page)
 
-                url = (
-                    f"https://www.amazon.com/s?k={query.replace(' ', '+')}"
-                    f"&page={page_num}"
-                )
+                # Force Amazon US store
+                await context.add_cookies([
+                    {
+                        "name": "i18n-prefs",
+                        "value": "USD",
+                        "domain": ".amazon.com",
+                        "path": "/"
+                    },
+                    {
+                        "name": "sp-cdn",
+                        "value": "L5Z9:GH",
+                        "domain": ".amazon.com",
+                        "path": "/"
+                    },
+                    {
+                        "name": "lc-main",
+                        "value": "en_US",
+                        "domain": ".amazon.com",
+                        "path": "/"
+                    }
+                ])
+
+                url = f"https://www.amazon.com/s?k={query.replace(' ', '+')}&page={page_num}&language=en_US&currency=USD"
+
                 print(f"\n  Page {page_num}/{MAX_PAGES} — UA: {ua[50:80]}...")
 
                 success = await goto_with_retry(page, url)

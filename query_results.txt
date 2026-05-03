@@ -1,31 +1,31 @@
 AMAZON RAG PIPELINE — HYBRID SEARCH RESULTS
-Chunks indexed: 619 | Products: 316 | Categories: 10
+Chunks indexed: 665 | Products: 316 | Categories: 10
 
 Query: best noise cancellation for flights
-  [1] Soundcore Space 2 by Anker, Active Noise Cancelling Headphones, Comfortable Fit, 50H Playtime, LDAC Hi-Res Wireless Audio, Dual Connection, Clear Calls, Bluetooth 6.1, Nap Mode, Wearing Detection
-       USD N/A | Rating 4.4 | Sentiment: N/A
-  [2] Samsung Galaxy Buds Fan Edition(FE) SM-R400, Active Noise-Cancelling, Wireless Bluetooth v5.2 Earbuds, Android 8.0 and Up - (Graphite)
-       USD N/A | Rating 4.4 | Sentiment: N/A
-  [3] Sony WH-1000XM6 The Best Noise Canceling Wireless Headphones, HD NC Processor QN3, 12 Microphones, Adaptive NC Optimizer, Mastered by Engineers, Studio-Quality, 30-Hour Battery, Black
+  [1] Soundcore by Anker Space Q45 Adaptive Active Noise Cancelling Headphones, Reduce Noise by Up to 98%, 50H Playtime, App Control, LDAC Hi-Res Wireless Audio, Comfortable Fit, Clear Calls, Bluetooth 5.3
        USD N/A | Rating 4.3 | Sentiment: N/A
+  [2] Soundcore Space 2 by Anker, Active Noise Cancelling Headphones, Comfortable Fit, 50H Playtime, LDAC Hi-Res Wireless Audio, Dual Connection, Clear Calls, Bluetooth 6.1, Nap Mode, Wearing Detection
+       USD N/A | Rating 4.3 | Sentiment: N/A
+  [3] Eduiosma Active Noise Cancelling Headphones, Wireless Over Ear Bluetooth Headphones with Microphone, Transparency Mode, 70H Playtime, Hi-Res Audio, Deep Bass, Bluetooth 5.3, Lightweight Design,Black
+       USD N/A | Rating 4.5 | Sentiment: N/A
 Query: budget headphones under 50 dollars
-  [1] Smart Watch for Women, Answer/Make Call, 1.32'' AMOLED Ultra-Clear Screen Fitness Tracker with Heart Rate/Sleep/SpO2 Monitor, Smartwatch for iPhone/Samsung/Android, 110+ Sport Modes, 3ATM Waterproof
+  [1] Soundcore by Anker, Space One, Active Noise Cancelling Headphones, 2X Stronger Voice Reduction, 40H ANC Playtime, App Control, LDAC Hi-Res Wireless Audio, Comfortable Fit, Clear Calls, Bluetooth 5.3
        USD N/A | Rating 4.4 | Sentiment: N/A
   [2] Simple Houseware Mesh Laptop Stand with 11-Levels Adjustable Ventilated Computer Holder, Black
        USD N/A | Rating 4.7 | Sentiment: N/A
-  [3] Boean Bluetooth Headphones, Wireless Headphones with 16 Hours Playtime Bluetooth 5.3 Wireless Earbuds HD Stereo Sound IPX7 Waterproof Earphones AI Music Generation Workout Headset for Running Sports
+  [3] Soundcore Space 2 by Anker, Active Noise Cancelling Headphones, Comfortable Fit, 50H Playtime, LDAC Hi-Res Wireless Audio, Dual Connection, Clear Calls, Bluetooth 6.1, Nap Mode, Wearing Detection
        USD N/A | Rating 4.3 | Sentiment: N/A
 Query: battery life issues
-  [1] Smart Watch for Women, Answer/Make Call, 1.32'' AMOLED Ultra-Clear Screen Fitness Tracker with Heart Rate/Sleep/SpO2 Monitor, Smartwatch for iPhone/Samsung/Android, 110+ Sport Modes, 3ATM Waterproof
+  [1] Wireless Earbuds, Bluetooth 5.3 Headphones LED Power Display, 2026 New Wireless Earphones, 4 ENC Noise Cancelling Mic, HiFi Stereo, 48H Playtime Mini Case IP7 Waterproof for Sport Walk
        USD N/A | Rating 4.4 | Sentiment: N/A
-  [2] Garmin Forerunner 965 Running Smartwatch, Colorful AMOLED Display, Training Metrics and Recovery Insights, Black and Powder Gray, 010-02809-00
+  [2] Smart Watch for Women (3 Bands), Fitness Tracker with Bluetooth Calls, IPX8 Waterproof Smartwatch for Android iPhone, 112+ Sport Modes, Heart Rate/Sleep/SpO2 Monitor, Gold
+       USD N/A | Rating 4.3 | Sentiment: N/A
+  [3] JLab JBuds Lux ANC Wireless Bluetooth Headphones & Audio Bundles, Hybrid Active Noise Cancelling, Premium Over-Ear Headset with Optional True Wireless Earbuds
        USD N/A | Rating 4.6 | Sentiment: N/A
-  [3] Portable Bluetooth Speaker, 2026 Bluetooth Wireless Speaker 5.4 with RGB Lights, 30H Playtime with Deep Bass, IP7 Waterproof, TWS Pairing, Portable Speaker for Travel/Party/Home/Gifts, Black
-       USD N/A | Rating 4.4 | Sentiment: N/A
 Query: wireless keyboard for mac
-  [1] TECKNET Bluetooth Keyboard Rechargeable, 4-Device Free Switching (2.4G+BT), Ultra-Slim Full Size Wireless Keyboard, Quiet Typing, for PC/Laptop/Smart TV/Phone, Adjustable Stand, 12 Multimedia Keys
+  [1] Macally Wireless Keyboard | 2.4G Computer Keyboard (Full Size, Quiet Keys) All Day Comfortable Typing with Wireless USB for Laptop, Desktop PC, Surface, Chromebook, Notebook
+       USD N/A | Rating 4.5 | Sentiment: N/A
+  [2] Logitech K480 Wireless Multi-Device Keyboard for Windows, macOS, iPadOS, Android or Chrome OS, Bluetooth, Compact, Compatible with PC, Mac, Laptop, Smartphone, Tablet - Black
        USD N/A | Rating 4.4 | Sentiment: N/A
-  [2] Wireless Keyboard and Mouse Combo, Full-Sized 2.4GHz Wireless Keyboard with Comfortable Palm Rest and Optical Wireless Mouse for Windows, Mac OS PC/Desktops/Computer/Laptops (Black)
-       USD N/A | Rating 4.4 | Sentiment: N/A
-  [3] TECKNET Wireless Keyboard and Mouse Combo, Mini Cordless Computer Keyboard and Mouse Set 2.4GHz, Silent Adjustable 1600 DPI, Quiet Click, Lag-Free for Computer, Laptop, PC, Windows, Mac, Chrome OS
-       USD N/A | Rating 4.4 | Sentiment: N/A
+  [3] Logitech K585 Multi-Device Slim Wireless Keyboard, Built-in Cradle for Device; for Laptop, Tablet, Desktop, Smartphone, Win/Mac, Bluetooth/Receiver, Compact, Easy Switch, 24 Month Battery - Graphite
+       USD N/A | Rating 4.5 | Sentiment: N/A

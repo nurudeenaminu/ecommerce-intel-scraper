@@ -1,8 +1,8 @@
 {
   "total_questions": 10,
-  "passed": 8,
-  "pass_rate": "80%",
-  "average_score": "65%",
+  "passed": 9,
+  "pass_rate": "90%",
+  "average_score": "80%",
   "per_question": [
     {
       "id": 1,
@@ -13,11 +13,12 @@
         "noise cancel"
       ],
       "matched_keywords": [
-        "sony"
+        "sony",
+        "noise cancel"
       ],
-      "score": 0.5,
+      "score": 1.0,
       "passed": true,
-      "answer_preview": "I do not have data for any Sony noise-cancelling headphones. The provided product data includes headphones from Soundcore by Anker, BERIBES, MZYMI, KVIDIO, and one with a generic title."
+      "answer_preview": "The Sony noise cancelling headphones available in the provided data are the Sony WH-1000XM6. They feature an HD NC Processor QN3, 12 microphones, and an Adaptive NC Optimizer."
     },
     {
       "id": 2,
@@ -34,7 +35,7 @@
       ],
       "score": 0.67,
       "passed": true,
-      "answer_preview": "Based on the product data provided, there are no wireless earbuds listed with a price explicitly under $50. The JLab JBuds Lux ANC Headphones are over-ear and a review mentions them being $50. All other earbud products list \"See site\" for pricing."
+      "answer_preview": "Based on the product data provided, there are no wireless earbuds explicitly listed with a price under $50. The prices for the listed earbuds are \"See site\"."
     },
     {
       "id": 3,
@@ -45,10 +46,12 @@
         "sound",
         "comfort"
       ],
-      "matched_keywords": [],
-      "score": 0.0,
+      "matched_keywords": [
+        "gaming"
+      ],
+      "score": 0.33,
       "passed": false,
-      "answer_preview": "Some customers have expressed mixed feelings about the plastic material used in Razer Kraken V3 X, perceiving its quality as compromised for lightweight design."
+      "answer_preview": "Based on the provided product data, there are no customer complaints explicitly mentioned for the WIRWTRU S30 Gaming Headset or the Tatybo Wireless Gaming Headset."
     },
     {
       "id": 4,
@@ -61,12 +64,11 @@
       ],
       "matched_keywords": [
         "charger",
-        "rating",
-        "review"
+        "rating"
       ],
-      "score": 1.0,
+      "score": 0.67,
       "passed": true,
-      "answer_preview": "The \"[2 Pack]Mini Portable Charger USB-C Power Bank 5200mAh\" has the best reviews among the portable chargers with a rating of 4.5/5."
+      "answer_preview": "The following portable chargers both have a rating of 4.5/5:\n\n*   [2-Pack]Portable Charger for iPhone 17/16/15,Mini Power Bank 5000mAh PD USB C Portable Phone Charger\n*   Power Bank, Ultra-Thin 10,000mAh Magnetic Wireless Portable Charger"
     },
     {
       "id": 5,
@@ -84,7 +86,7 @@
       ],
       "score": 1.0,
       "passed": true,
-      "answer_preview": "Based on the product data provided:\n\n*   **Raycon Impact Earbuds**: Offers 90 hours of total battery life with the charging case. The earbuds themselves provide 9 hours of charge, and the case holds 5 days of charge.\n*   **Status Between 3ANC Onyx True Active Noise Cancelling Wireless Earbuds**: Pro"
+      "answer_preview": "Based on the product data:\n\n*   The WZGHXL Active Noise Cancelling Headphones offer up to 78 hours of battery life from a 600mAh battery.\n*   The BERIBES Bluetooth Headphones provide 65 hours of playtime.\n*   The Hybrid Active Noise Cancelling Headphones have a 60-hour playtime. Users reported nearl"
     },
     {
       "id": 6,
@@ -97,11 +99,12 @@
       ],
       "matched_keywords": [
         "webcam",
-        "stream"
+        "stream",
+        "camera"
       ],
-      "score": 0.67,
+      "score": 1.0,
       "passed": true,
-      "answer_preview": "We have the following webcams that support streaming:\n\n*   **Logitech C922x HD Pro PC Webcam**: Offers Full HD 1080p/30fps or 720p/60fps video, HD Light Correction, and works with Microsoft Teams, Google Meet, Zoom, and Nintendo Switch 2's new GameChat mode. The review highlights its suitability for"
+      "answer_preview": "We have two webcams suitable for streaming:\n\n*   **Logitech StreamCam Premium Webcam:** This webcam offers Full HD 1080p at 60 fps and works with PC/Mac, Microsoft Teams, Google Meet, Zoom, and Nintendo Switch 2's new GameChat mode. It has a rating of 4.4/5.\n*   **Webcam Streaming Kit with USB RGB M"
     },
     {
       "id": 7,
@@ -112,10 +115,13 @@
         "rating",
         "star"
       ],
-      "matched_keywords": [],
-      "score": 0.0,
-      "passed": false,
-      "answer_preview": "ERROR: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-"
+      "matched_keywords": [
+        "watch",
+        "rating"
+      ],
+      "score": 0.67,
+      "passed": true,
+      "answer_preview": "Yes, there is a Smart Watch for Women with a rating of 4.4/5."
     },
     {
       "id": 8,
@@ -132,7 +138,7 @@
       ],
       "score": 0.67,
       "passed": true,
-      "answer_preview": "Based on the product data provided, there is no information about customer sentiment regarding Bluetooth speakers."
+      "answer_preview": "Based on the product data provided, there is no information about customer sentiment regarding Bluetooth speakers. The products listed are headphones, a gaming headset, a smart watch, a webcam, and a keyboard."
     },
     {
       "id": 9,
@@ -150,7 +156,7 @@
       ],
       "score": 1.0,
       "passed": true,
-      "answer_preview": "Yes, the following wireless keyboards are compatible with Mac:\n\n*   **Wireless Keyboard and Mouse Combo:** Compatible with Mac OS.\n*   **TECKNET Bluetooth Keyboard Rechargeable:** Features layout support for both Mac and Windows and works with Macbooks.\n*   **KLIM Chroma Wireless Keyboard RGB Backli"
+      "answer_preview": "Yes, the following wireless keyboards are compatible with Mac:\n\n*   **Wireless Keyboard and Mouse Combo (Black)**: Compatible with Mac OS.\n*   **Logitech MX Mechanical Wireless Illuminated Performance Keyboard (Graphite)**: Compatible with macOS.\n*   **AULA 99 Key Keyboard (Pink)**: Compatible with "
     },
     {
       "id": 10,
@@ -168,7 +174,7 @@
       ],
       "score": 1.0,
       "passed": true,
-      "answer_preview": "The price for all listed laptop stands is \"See site,\" so it's not possible to determine the cheapest from the provided data."
+      "answer_preview": "Price information is not available in the provided product data for any of the laptop stands. All listed products state \"Price: See site.\""
     }
   ]
 }
