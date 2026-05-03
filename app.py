@@ -16,13 +16,21 @@ TOP_K           = 5
 BM25_WEIGHT     = 0.3
 GEMINI_MODEL    = "gemini-2.5-flash"
 
-SYSTEM_PROMPT = """You are a knowledgeable e-commerce product assistant.
-You help users find the right products based on their needs, budget, and preferences.
-You have access to real Amazon product data including descriptions, customer reviews,
-prices, ratings, and sentiment analysis scores.
+def build_system_prompt(chunk_count, product_count, categories):
+    cat_list = "\n".join(f"  - {cat.title()}" for cat in sorted(categories))
+    return f"""You are a knowledgeable e-commerce product assistant for ShopMind AI.
+
+DATASET FACTS — answer these precisely when asked:
+- Total chunks indexed: {chunk_count}
+- Total unique products: {product_count}
+- Total categories: {len(categories)}
+- Categories available:
+{cat_list}
+
 Guidelines:
-- Answer based ONLY on the product data provided
-- If context lacks info, say so clearly
+- Answer based ONLY on the product data provided in the context
+- When asked how many products, chunks, or categories you have, use the DATASET FACTS above
+- If context lacks info for a specific product question, say so clearly
 - Never invent product names, prices, or features
 - Mention price, rating, and fit when recommending
 - Be conversational, warm, and concise
@@ -218,8 +226,10 @@ def main():
         return
 
     # Header
-    chunk_count = collection.count()
+    chunk_count   = collection.count()
     product_count = len(set(c.get("product_name","") for c in all_chunks))
+    cat_count     = len(set(c.get("category","") for c in all_chunks if c.get("category")))
+
     st.markdown(f"""
     <div style="display:flex;align-items:center;gap:12px;padding-bottom:1rem;
         border-bottom:1px solid #2a2a35;margin-bottom:1.5rem;">
@@ -230,7 +240,7 @@ def main():
             <div style="font-size:12px;color:#6b6b80;">
                 <span style="display:inline-block;width:7px;height:7px;background:#22c55e;
                 border-radius:50%;margin-right:5px;"></span>
-                Online · {chunk_count} chunks · {product_count} products · Hybrid search
+                Online · {chunk_count} chunks · {product_count} products · {cat_count} categories
             </div>
         </div>
     </div>""", unsafe_allow_html=True)
@@ -303,7 +313,12 @@ def main():
             for m in st.session_state.history[-4:]:
                 history_text += f"{'User' if m['role']=='user' else 'Assistant'}: {m['content']}\n\n"
 
-            prompt = (f"{SYSTEM_PROMPT}\n\n{history_text}"
+            system_prompt = build_system_prompt(
+                collection.count(),
+                len(set(c.get("product_name","") for c in all_chunks)),
+                set(c.get("category","") for c in all_chunks if c.get("category"))
+            )
+            prompt = (f"{system_prompt}\n\n{history_text}"
                       f"Product data:\n\n{context}\n\n---\nUser: {user_input}\nAssistant:")
             try:
                 resp   = gemini_client.models.generate_content(model=GEMINI_MODEL, contents=prompt)
