@@ -34,7 +34,9 @@ Guidelines:
 - Never invent product names, prices, or features
 - Mention price, rating, and fit when recommending
 - Be conversational, warm, and concise
-- Outside dataset: say you don't have reliable data on that"""
+- Outside dataset: say you don't have reliable data on that
+- When asked about prices, they are in USD. Always include the price when recommending products.
+- When asked for average price, calculate it from the prices shown in the product data context."""
 
 st.set_page_config(
     page_title="ShopMind AI",
@@ -150,14 +152,24 @@ def build_context(results):
     parts, seen = [], set()
     for doc, data in results:
         meta = data["meta"]
-        name = meta.get("product_name","Unknown")
+        name = meta.get("product_name", "Unknown")
         hdr  = ""
         if name not in seen:
             seen.add(name)
-            try:    ps = f"USD {float(meta.get('price_usd',0)):.2f}" if float(meta.get('price_usd',0)) > 0 else "See site"
-            except: ps = "See site"
-            hdr = (f"Product: {name}\nPrice: {ps} | Rating: {meta.get('rating','N/A')}/5 | "
-                   f"Sentiment: {meta.get('sentiment_label','N/A')}\nURL: {meta.get('source_url','')}\n")
+            # Robust price extraction
+            price_raw = meta.get("price_usd", "0") or "0"
+            try:
+                price_val = float(str(price_raw).replace(",", ""))
+                price_str = f"USD {price_val:.2f}" if price_val > 0 else "See site"
+            except Exception:
+                price_str = "See site"
+
+            hdr = (
+                f"Product: {name}\n"
+                f"Price: {price_str} | Rating: {meta.get('rating','N/A')}/5 | "
+                f"Sentiment: {meta.get('sentiment_label','N/A')}\n"
+                f"URL: {meta.get('source_url','')}\n"
+            )
         parts.append(f"{hdr}[{meta.get('type','').upper()}]: {doc}\n")
     return "\n---\n".join(parts)
 
