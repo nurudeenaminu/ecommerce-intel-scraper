@@ -156,19 +156,30 @@ def build_context(results):
         hdr  = ""
         if name not in seen:
             seen.add(name)
-            # Robust price extraction
-            price_raw = meta.get("price_usd", "0") or "0"
-            try:
-                price_val = float(str(price_raw).replace(",", ""))
-                price_str = f"USD {price_val:.2f}" if price_val > 0 else "See site"
-            except Exception:
-                price_str = "See site"
+
+            # Try every possible price key
+            price_val = 0.0
+            for key in ["price_usd", "price", "price_raw"]:
+                raw = meta.get(key, "")
+                if raw and str(raw) not in ("", "0", "0.0", "None", "nan"):
+                    try:
+                        price_val = float(str(raw).replace(",", "").replace("$", ""))
+                        if price_val > 0:
+                            break
+                    except Exception:
+                        continue
+
+            price_str = f"USD {price_val:.2f}" if price_val > 0 else "See site"
+            rating    = meta.get("rating", "N/A")
+            sentiment = meta.get("sentiment_label", "N/A")
+            url       = meta.get("source_url", "")
+            cat       = meta.get("category", "N/A")
 
             hdr = (
                 f"Product: {name}\n"
-                f"Price: {price_str} | Rating: {meta.get('rating','N/A')}/5 | "
-                f"Sentiment: {meta.get('sentiment_label','N/A')}\n"
-                f"URL: {meta.get('source_url','')}\n"
+                f"Price: {price_str} | Rating: {rating}/5 | "
+                f"Sentiment: {sentiment} | Category: {cat}\n"
+                f"URL: {url}\n"
             )
         parts.append(f"{hdr}[{meta.get('type','').upper()}]: {doc}\n")
     return "\n---\n".join(parts)

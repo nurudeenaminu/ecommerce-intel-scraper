@@ -29,22 +29,16 @@ def build_collection(client, chunks, model):
 
     ids       = [c["chunk_id"] for c in chunks]
     documents = [c["text"] for c in chunks]
-    metadatas = [
-        {
-            "asin":                   str(c.get("asin", "")),
-            "product_name":           str(c.get("product_name", "")),
-            "price_usd":              str(c.get("price_usd", 0.0)),
-            "rating":                 str(c.get("rating", 0.0)),
-            "review_count":           str(c.get("review_count", 0)),
-            "sentiment_score":        str(c.get("sentiment_score", 0.0)),
-            "sentiment_label":        str(c.get("sentiment_label", "neutral")),
-            "sentiment_subjectivity": str(c.get("sentiment_subjectivity", 0.0)),
-            "category":               str(c.get("category", "")),
-            "type":                   str(c.get("type", "")),
-            "source_url":             str(c.get("source_url", "")),
-        }
-        for c in chunks
-    ]
+    metadatas = [{
+        "product_name":    str(c.get("product_name", "")),
+        "price_usd":       str(c.get("price_usd", "0")),
+        "rating":          str(c.get("rating", "0")),
+        "sentiment_label": str(c.get("sentiment_label", "")),
+        "sentiment_score": str(c.get("sentiment_score", "0")),
+        "category":        str(c.get("category", "")),
+        "type":            str(c.get("type", "")),
+        "source_url":      str(c.get("source_url", "")),
+    } for c in chunks]
 
     print(f"Embedding {len(documents)} chunks...")
     embeddings = model.encode(documents, show_progress_bar=True).tolist()

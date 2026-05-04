@@ -193,37 +193,40 @@ def hybrid_search(query, collection, embedder, bm25, all_chunks, filters, top_k=
 
 # ─── CONTEXT BUILDER ──────────────────────────────────────
 def build_context(results):
-    context_parts = []
-    seen_products = set()
-
+    parts, seen = [], set()
     for doc, data in results:
-        meta         = data["meta"]
-        product_name = meta.get("product_name", "Unknown")
-        price        = meta.get("price_usd", "0")
-        rating       = meta.get("rating", "N/A")
-        sentiment    = meta.get("sentiment_label", "N/A")
-        category     = meta.get("category", "N/A")
-        url          = meta.get("source_url", "")
-        chunk_type   = meta.get("type", "")
+        meta = data["meta"]
+        name = meta.get("product_name", "Unknown")
+        hdr  = ""
+        if name not in seen:
+            seen.add(name)
 
-        header = ""
-        if product_name not in seen_products:
-            seen_products.add(product_name)
-            try:
-                price_str = f"USD {float(price):.2f}" if float(price) > 0 else "See site"
-            except Exception:
-                price_str = "See site"
-            header = (
-                f"Product: {product_name}\n"
+            # Try every possible price key
+            price_val = 0.0
+            for key in ["price_usd", "price", "price_raw"]:
+                raw = meta.get(key, "")
+                if raw and str(raw) not in ("", "0", "0.0", "None", "nan"):
+                    try:
+                        price_val = float(str(raw).replace(",", "").replace("$", ""))
+                        if price_val > 0:
+                            break
+                    except Exception:
+                        continue
+
+            price_str = f"USD {price_val:.2f}" if price_val > 0 else "See site"
+            rating    = meta.get("rating", "N/A")
+            sentiment = meta.get("sentiment_label", "N/A")
+            url       = meta.get("source_url", "")
+            cat       = meta.get("category", "N/A")
+
+            hdr = (
+                f"Product: {name}\n"
                 f"Price: {price_str} | Rating: {rating}/5 | "
-                f"Sentiment: {sentiment} | Category: {category}\n"
+                f"Sentiment: {sentiment} | Category: {cat}\n"
                 f"URL: {url}\n"
             )
-
-        context_parts.append(f"{header}[{chunk_type.upper()}]: {doc}\n")
-
-    return "\n---\n".join(context_parts)
-
+        parts.append(f"{hdr}[{meta.get('type','').upper()}]: {doc}\n")
+    return "\n---\n".join(parts)
 # ─── CHAT FUNCTION ────────────────────────────────────────
 def chat(user_message, history, collection, embedder, bm25, all_chunks, gemini_client):
     # Parse filters
